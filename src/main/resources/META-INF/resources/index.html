@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hangman</title>
+</head>
+<body>
+    <h1>Welcome to hangman!</h1>
+
+    <pre id="hangman-container"></pre>
+
+    <div class="guess-container">
+        <label for="guess">Guess a letter:</label>
+        <input id="guess" type="text" maxlength="1" required>
+        <button id="guess-button">OK</button>
+    </div>
+
+    <button id="restart-button">Start a new game</button>
+
+    <script type="text/javascript">
+        async function getGameState() {
+            try {
+                const result = await fetch("/hangman");
+                document.querySelector("#hangman-container").innerHTML = await result.text();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function startGame() {
+            await fetch("hangman/start", { method: "POST" });
+            await getGameState();
+        }
+
+        async function sendGuess() {
+            const guessValue = document.querySelector("#guess").value;
+            if (!guessValue) {
+                alert("Please type a letter.")
+                return;
+            }
+
+            try {
+                await fetch("/hangman/" + guessValue.toLowerCase(), { method: "POST" });
+                await getGameState();
+            } catch (error) {
+                alert("Error: " + error);
+                console.error(error);
+            } finally {
+                document.querySelector("#guess").value = "";
+            }
+        }
+
+        async function init() {
+            document.querySelector("#guess-button").addEventListener('click', sendGuess);
+            document.querySelector("#restart-button").addEventListener("click", startGame);
+            await getGameState()
+        }
+
+        init();
+    </script>
+</body>
+<style>
+    #hangman-container {
+        white-space: pre-wrap;
+    }
+
+    #restart-button {
+        margin-top: 1rem;
+    }
+
+    .guess-container {
+        display: flex;
+        flex-direction: row;
+        grid-gap: 1rem;
+    }
+</style>
+</html>
