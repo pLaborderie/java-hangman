@@ -2,6 +2,7 @@ FROM eclipse-temurin:21 AS build
 RUN mkdir /app
 COPY . /app
 WORKDIR /app
+RUN chmod +x ./mvnw
 RUN ./mvnw clean install
 
 FROM eclipse-temurin:21
