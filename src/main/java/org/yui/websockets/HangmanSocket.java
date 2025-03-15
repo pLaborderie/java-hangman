@@ -14,12 +14,13 @@ public class HangmanSocket {
     WebSocketConnection connection;
 
     @Inject
-    HangmanService hangmanService;
+    GameSessionManager gameSessionManager;
 
     @OnOpen(broadcast = true)
     public ChatMessage onOpen() {
-        sendGameState();
-        return new ChatMessage(MessageType.USER_JOINED, connection.pathParam("room"), connection.pathParam("username"), null);
+        String roomName = connection.pathParam("room");
+        sendGameState(roomName);
+        return new ChatMessage(MessageType.USER_JOINED, roomName, connection.pathParam("username"), null);
     }
 
     @OnClose
@@ -31,20 +32,23 @@ public class HangmanSocket {
     @OnTextMessage(broadcast = true)
     public ChatMessage onMessage(ChatMessage message) {
         if (message.type == MessageType.GUESS_LETTER) {
+            HangmanService hangmanService = gameSessionManager.getGame(message.room);
             hangmanService.addGuess(message.message);
-            sendGameState();
+            sendGameState(message.room);
         } else if (message.type == MessageType.START_GAME) {
+            HangmanService hangmanService = gameSessionManager.getGame(message.room);
             hangmanService.startGame();
-            sendGameState();
+            sendGameState(message.room);
         }
         return message;
     }
 
-    public void sendGameState() {
+    public void sendGameState(String roomName) {
+        HangmanService hangmanService = gameSessionManager.getGame(roomName);
         String state = hangmanService.printGameState();
         ChatMessage message = new ChatMessage(
             MessageType.GAME_STATE,
-            connection.pathParam("room"),
+            roomName,
             "SYSTEM",
             state
         );

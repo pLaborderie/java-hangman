@@ -195,6 +195,7 @@
             const chatMessage = {
                 type: "START_GAME",
                 from: username,
+                room: room,
                 message: "",
             };
             socket.send(JSON.stringify(chatMessage));

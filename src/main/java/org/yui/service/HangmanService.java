@@ -1,7 +1,7 @@
 package org.yui.service;
 
 import io.quarkus.logging.Log;
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
 import org.yui.util.HangmanASCIIDrawer;
 import org.yui.util.WordSelector;
 
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ApplicationScoped
+@RequestScoped
 public class HangmanService {
     private final int MAX_TRIES = 6;
     private final String LETTER_PLACEHOLDER = "_";
