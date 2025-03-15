@@ -130,7 +130,9 @@
                 return;
             }
 
-            socket = new WebSocket(`ws://${location.host}/ws/hangman/${room}/${username}`);
+            console.log(location.host);
+            const prefix = location.host.includes('localhost') ? 'ws' : 'wss';
+            socket = new WebSocket(`${prefix}://${location.host}/ws/hangman/${room}/${username}`);
             socket.onopen = function () {
                 connected = true;
                 console.log("Connected to the web socket in room", room);
